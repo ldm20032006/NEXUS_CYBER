@@ -1,0 +1,111 @@
+{
+  "info": {
+    "name": "NEXUS Smart Cyber Esports",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Smoke collection for NEXUS local/dev validation. No real secrets are included."
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8080" },
+    { "key": "apiBase", "value": "{{baseUrl}}/api/v1" },
+    { "key": "accessToken", "value": "" },
+    { "key": "refreshToken", "value": "" },
+    { "key": "idempotencyKey", "value": "replace-per-request" },
+    { "key": "lobbyId", "value": "" },
+    { "key": "voiceWebhookTimestamp", "value": "" },
+    { "key": "voiceWebhookSignature", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "Health",
+      "item": [
+        { "name": "API health", "request": { "method": "GET", "url": "{{apiBase}}/health" } },
+        { "name": "Actuator health", "request": { "method": "GET", "url": "{{baseUrl}}/actuator/health" } }
+      ]
+    },
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register gamer",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"displayName\": \"Demo Gamer\",\n  \"email\": \"demo.gamer@example.test\",\n  \"phone\": \"+84900000000\",\n  \"password\": \"ChangeMe123!\"\n}" },
+            "url": "{{apiBase}}/auth/register"
+          }
+        },
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"identifier\": \"demo.gamer@example.test\",\n  \"password\": \"ChangeMe123!\"\n}" },
+            "url": "{{apiBase}}/auth/login"
+          }
+        },
+        {
+          "name": "Current user",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "url": "{{apiBase}}/auth/me"
+          }
+        },
+        {
+          "name": "Refresh token",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"refreshToken\": \"{{refreshToken}}\"\n}" },
+            "url": "{{apiBase}}/auth/refresh-token"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Gamer",
+      "item": [
+        { "name": "Profile", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }], "url": "{{apiBase}}/profiles/me" } },
+        { "name": "Current session", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }], "url": "{{apiBase}}/sessions/current" } },
+        { "name": "Wallet", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }], "url": "{{apiBase}}/wallets/me" } },
+        { "name": "Menu items", "request": { "method": "GET", "url": "{{apiBase}}/menu/items" } },
+        { "name": "Notifications", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }], "url": "{{apiBase}}/notifications" } }
+      ]
+    },
+    {
+      "name": "Admin Smoke",
+      "item": [
+        { "name": "List branches", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }], "url": "{{apiBase}}/admin/branches" } },
+        { "name": "List stations", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }], "url": "{{apiBase}}/admin/stations" } },
+        { "name": "Dashboard overview", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }], "url": "{{apiBase}}/admin/dashboard/overview" } },
+        { "name": "Audit logs", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }], "url": "{{apiBase}}/admin/audit-logs" } }
+      ]
+    },
+    {
+      "name": "Voice",
+      "item": [
+        {
+          "name": "Issue lobby voice token",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "url": "{{apiBase}}/lobbies/{{lobbyId}}/voice/token"
+          }
+        },
+        {
+          "name": "Mock voice webhook",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "X-Voice-Timestamp", "value": "{{voiceWebhookTimestamp}}" },
+              { "key": "X-Voice-Signature", "value": "{{voiceWebhookSignature}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"eventId\": \"voice-event-1\",\n  \"eventType\": \"participant.joined\",\n  \"lobbyId\": \"{{lobbyId}}\"\n}" },
+            "url": "{{apiBase}}/lobbies/voice/webhooks/mock"
+          }
+        }
+      ]
+    }
+  ]
+}

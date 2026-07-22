@@ -1,0 +1,14 @@
+.idea/
+*.iml
+*.log
+*.err
+
+server/.gradle/
+server/build/
+server/perf-*.log
+server/perf-*.err
+
+client/node_modules/
+client/dist/
+client/coverage/
+client/test-results/
